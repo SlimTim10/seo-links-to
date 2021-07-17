@@ -1,0 +1,30 @@
+{
+  "name": "seo-links-to",
+  "version": "1.0.0",
+  "description": "Command line SEO tool",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SlimTim10/seo-links-to.git"
+  },
+  "keywords": [
+    "seo",
+    "cli",
+    "crawler"
+  ],
+  "author": "Tim Johns",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/SlimTim10/seo-links-to/issues"
+  },
+  "homepage": "https://github.com/SlimTim10/seo-links-to#readme",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "cheerio": "^1.0.0-rc.10",
+    "minimist": "^1.2.5",
+    "ramda": "^0.27.1"
+  }
+}
