@@ -3,30 +3,30 @@
 Command line SEO tool to crawl pages of a website and find out which pages have links to a target website.
 
 ** Installing
-#+begin_src sh
-  $ git clone https://github.com/SlimTim10/seo-links-to
-  $ cd seo-links-to
-  $ npm install
+#+begin_src
+$ git clone https://github.com/SlimTim10/seo-links-to
+$ cd seo-links-to
+$ npm install
 #+end_src
 
 ** Usage
-#+begin_src sh
-  $ node main.js --website=<website-URL> --links-to=<target-URL> [--depth=<number>]
+#+begin_src
+$ node main.js --website=<website-URL> --links-to=<target-URL> [--depth=<number>]
 #+end_src
 
 For example, to scan for pages of https://crawler-test.com that include any links to http://robotto.org:
 
-#+begin_src sh
-  $ node main.js --website=https://crawler-test.com/ --links-to=http://robotto.org/ --depth=1
+#+begin_src
+$ node main.js --website=https://crawler-test.com/ --links-to=http://robotto.org/ --depth=1
 
-  Scanning for pages (1 level deep)...
-  Found 409 pages on https://crawler-test.com
+Scanning for pages (1 level deep)...
+Found 409 pages on https://crawler-test.com
 
-  Scanning pages for links...
-  Found 2 pages that link to http://robotto.org/:
+Scanning pages for links...
+Found 2 pages that link to http://robotto.org/:
 
-  https://crawler-test.com/links/broken_links_external
-  https://crawler-test.com/links/max_external_links
+https://crawler-test.com/links/broken_links_external
+https://crawler-test.com/links/max_external_links
 #+end_src
 
 Default page scanning depth is 2.
