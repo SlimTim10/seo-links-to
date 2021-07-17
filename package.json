@@ -1,7 +1,7 @@
 {
   "name": "seo-links-to",
   "version": "1.0.0",
-  "description": "Command line SEO tool",
+  "description": "Command line SEO tool to crawl pages of a website and find out which pages have links to a target website.",
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
