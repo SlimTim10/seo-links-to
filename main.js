@@ -5,7 +5,7 @@ const R = require('ramda')
 // (String, String) -> Boolean
 const isInternalLink = (base, link) => (
   link.startsWith(base)
-    || (!link.startsWith('https://') && !link.startsWith('http://') && !link.includes(':'))
+    || !link.includes(':')
 )
 
 // Fix up an internal link by adding the base URL and potentially removing extra slashes
@@ -46,8 +46,8 @@ const getLinks = async (base, page) => {
 const getInternalLinks = async (base, page) => {
   const allLinks = await getLinks(base, page)
   const internalLinks = R.uniq(R.compose(
-    R.filter(R.curry(isInternalLink)(base)),
-    R.map(R.curry(fixInternalLink)(base)(page))
+    R.map(R.curry(fixInternalLink)(base)(page)),
+    R.filter(R.curry(isInternalLink)(base))
   )(
     allLinks
   ))
@@ -125,7 +125,7 @@ const fixBase = url => {
     intermediate
   )
 
-  console.log(`Found ${results.length} ${pluralize('page', 'pages', results.length)} that ${pluralize('links', 'link', results.length)} to ${target}:\n`)
+  console.log(`Found ${results.length} ${pluralize('page', 'pages', results.length)} that ${pluralize('links', 'link', results.length)} to ${target}${results.length === 0 ? '.' : ':'}\n`)
   results.forEach(result => console.log(result))
 
 })();
