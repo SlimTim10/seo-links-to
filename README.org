@@ -11,25 +11,48 @@ $ npm install
 
 ** Usage
 #+begin_src
-$ node main.js --website=<website-URL> --links-to=<target-URL> [--depth=<number>]
+$ node main.js --url=<website-URL> --links-to=<target-URL> [--depth=<number>]
 #+end_src
+
+The given URL can be a website or an XML sitemap. The ~links-to~ argument is what is searched for in the links of the pages of the given website or sitemap. Specifically, it looks for links beginning with the given ~links-to~ argument. The page scanning depth is only used if a website URL is given (not a sitemap) and the default depth is 2.
 
 For example, to scan for pages of https://crawler-test.com that include any links to http://robotto.org:
 
 #+begin_src
-$ node main.js --website=https://crawler-test.com/ --links-to=http://robotto.org/ --depth=1
-
+$ node main.js --url=https://crawler-test.com/ --links-to=http://robotto.org/ --depth=1
 Scanning for pages (1 level deep)...
-Found 409 pages on https://crawler-test.com
+Found 405 pages on https://crawler-test.com/
 
 Scanning pages for links...
+........................................................................................................................................................................................................
+........................................................................................................................................................................................................
+.....
+
 Found 2 pages that link to http://robotto.org/:
 
 https://crawler-test.com/links/broken_links_external
 https://crawler-test.com/links/max_external_links
 #+end_src
 
-Default page scanning depth is 2.
+To scan for pages of https://hackaday.com/news-sitemap.xml that include any links to https://github.com:
+
+#+begin_src
+$ node main.js --url=https://hackaday.com/news-sitemap.xml --links-to=https://github.com
+Found 24 pages on https://hackaday.com/news-sitemap.xml
+
+Scanning pages for links...
+........................
+
+Found 7 pages that link to https://github.com:
+
+https://hackaday.com/2021/07/17/control-an-irl-home-from-minecraft/
+https://hackaday.com/2021/07/17/png-image-decoding-library-does-it-with-minimal-ram/
+https://hackaday.com/2021/07/17/reinvented-retro-contest-winners-announced/
+https://hackaday.com/2021/07/17/open-source-is-choice/
+https://hackaday.com/2021/07/16/interpreters-in-scala/
+https://hackaday.com/2021/07/16/just-what-have-we-become/
+https://hackaday.com/2021/07/16/hackaday-podcast-127-whippletree-clamps-sniffing-your-stomach-radio-multimeter-hum-fix-and-c64-demo-no-c64/
+#+end_src
 
 ** Dependencies
 - Node.js version 12 or later

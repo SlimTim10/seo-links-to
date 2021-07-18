@@ -1,6 +1,7 @@
+const R = require('ramda')
 const cheerio = require('cheerio')
 const axios = require('axios')
-const R = require('ramda')
+const xml2js = new (require('xml2js')).Parser()
 
 // (String, String) -> Boolean
 const isInternalLink = (base, link) => (
@@ -28,8 +29,8 @@ const isExternalLink = (base, link) => (
 // (String, String) -> [String]
 const getLinks = async (base, page) => {
   try {
-    const pageObj = await axios(page)
-    const $ = cheerio.load(pageObj.data)
+    const html = (await axios(page)).data
+    const $ = cheerio.load(html)
     return R.uniq(
       $('a')
         .toArray()
@@ -71,6 +72,13 @@ const crawl = async (base, depth = 2, currentPage = base) => {
   )
 }
 
+const linksFromSitemap = async sitemap => {
+  const xml = (await axios(sitemap)).data
+  const results = await xml2js.parseStringPromise(xml)
+  if (!results.urlset || !results.urlset.url) return []
+  return R.flatten(results.urlset.url.map(R.prop('loc')))
+}
+
 // Returns true if the page contains any links that begin with the target, otherwise false.
 // (String, String, String) -> Boolean
 const pageLinksTo = async (target, base, page) => R.any(R.startsWith(target))(
@@ -79,10 +87,10 @@ const pageLinksTo = async (target, base, page) => R.any(R.startsWith(target))(
 
 const usage = () => {
   console.log('Usage:\n')
-  console.log('    node main.js --website=<website-URL> --links-to=<target-URL> [--depth=<number>]\n')
+  console.log('    node main.js --url=<website-or-sitemap> --links-to=<target-URL> [--depth=<number>]\n')
   console.log('For example, to scan for pages of https://crawler-test.com that include any links to http://robotto.org:\n')
-  console.log('    node main.js --website=https://crawler-test.com/ --links-to=http://robotto.org/\n')
-  console.log('    node main.js --website=https://crawler-test.com/ --links-to=http://robotto.org/ --depth=1\n')
+  console.log('    node main.js --url=https://crawler-test.com/ --links-to=http://robotto.org/\n')
+  console.log('    node main.js --url=https://crawler-test.com/ --links-to=http://robotto.org/ --depth=1\n')
   console.log('Default page scanning depth is 2.')
 }
 
@@ -90,33 +98,37 @@ const pluralize = (singular, plural, n) => n === 1 ? singular : plural
 
 const nullish = x => x === null || x === undefined
 
-const fixBase = url => {
-  const { hostname } = new URL(url)
-  return `https://${hostname}`
-}
-
 ;(async () => {
   const argv = require('minimist')(process.argv.slice(2))
 
-  if (!argv.website || !argv['links-to']) return usage()
+  if (!argv.url || !argv['links-to']) return usage()
 
-  const [ base, target ] = [ fixBase(argv.website), argv['links-to'] ]
+  const [ base, target ] = [ argv.url, argv['links-to'] ]
   const depth = nullish(argv.depth) ? 2 : argv.depth
 
-  console.log(`Scanning for pages (${depth} ${pluralize('level', 'levels', depth)} deep)...`)
-  
-  const pages = await crawl(base, depth)
+  const pages = (
+    base.endsWith('.xml') ? await linksFromSitemap(base)
+      : (
+        console.log(`Scanning for pages (${depth} ${pluralize('level', 'levels', depth)} deep)...`),
+        await crawl(base, depth)
+      )
+  )
 
   console.log(`Found ${pages.length} ${pluralize('page', 'pages', pages.length)} on ${base}\n`)
   
   console.log(`Scanning pages for links...`)
 
   const intermediate = await Promise.all(
-    pages.map(async page => ({
-      page,
-      bool: await pageLinksTo(target, base, page)
-    }))
+    pages.map(async page => {
+      const bool = await pageLinksTo(target, base, page)
+      process.stdout.write('.')
+      return {
+        page,
+        bool
+      }
+    })
   )
+  console.log('\n')
   
   const results = R.compose(
     R.map(R.prop('page')),
